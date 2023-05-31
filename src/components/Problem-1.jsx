@@ -1,8 +1,45 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const Problem1 = () => {
   const [users, setUsers] = useState([]);
   const [show, setShow] = useState('all');
+  const [filteredUsers, setFilteredUsers] = useState([]);
+
+  const sortByStatus = (a, b) => {
+    const statusOrder = { active: 1, completed: 2 };
+    const statusA = statusOrder[a.status];
+    const statusB = statusOrder[b.status];
+
+    if (statusA === statusB) {
+      return 0;
+    }
+
+    return statusA < statusB ? -1 : 1;
+  };
+
+  useEffect(() => {
+    if (show === 'completed') {
+      const newUsers = users?.filter(user => user.status === 'completed');
+
+      setFilteredUsers(newUsers);
+    } else if (show === 'active') {
+      const newUsers = users?.filter(user => user.status === 'active');
+
+      setFilteredUsers(newUsers);
+    } else if (show === 'all') {
+      let activeAndCompleted = users.filter(
+        user => user.status === 'active' || user.status === 'completed'
+      );
+
+      activeAndCompleted = activeAndCompleted.sort(sortByStatus);
+
+      const restUsers = users?.filter(
+        user => user?.status !== 'active' && user?.status !== 'completed'
+      );
+
+      setFilteredUsers([...activeAndCompleted, ...restUsers]);
+    }
+  }, [show, users]);
 
   const handleClick = val => {
     setShow(val);
@@ -14,9 +51,11 @@ const Problem1 = () => {
     const form = e.target;
 
     const name = form.name.value;
-    const status = form.status.value;
+    const status = form.status.value.toLowerCase();
 
     setUsers([...users, { name, status }]);
+
+    form.reset();
   };
 
   return (
@@ -34,6 +73,7 @@ const Problem1 = () => {
                 className='form-control'
                 placeholder='Name'
                 name='name'
+                required
               />
             </div>
             <div className='col-auto'>
@@ -42,6 +82,7 @@ const Problem1 = () => {
                 className='form-control'
                 placeholder='Status'
                 name='status'
+                required
               />
             </div>
             <div className='col-auto'>
@@ -90,8 +131,8 @@ const Problem1 = () => {
               </tr>
             </thead>
             <tbody>
-              {users?.map(user => (
-                <tr>
+              {filteredUsers?.map((user, i) => (
+                <tr key={i}>
                   <td>{user.name}</td>
                   <td>{user.status}</td>
                 </tr>
