@@ -7,7 +7,7 @@ const ModalA = ({ show, handleClose, setModal }) => {
   useEffect(() => {
     const getContacts = async () => {
       const res = await fetch(
-        'https://contact.mediusware.com/api/contacts/?page_size=5'
+        'https://contact.mediusware.com/api/contacts/?page_size=10'
       );
 
       const data = await res.json();
